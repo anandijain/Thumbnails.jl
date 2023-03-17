@@ -9,7 +9,7 @@ img_height = 1080 ÷ 2
 img_width = 1920 ÷ 2
 
 # Set the number of frames and calculate the frame delta
-num_frames = 300
+num_frames = 30
 frame_delta = 2 * pi / num_frames
 
 # Create a folder to store each frame
@@ -44,4 +44,4 @@ for i = 1:num_frames
     flush(stdout)
 end
 
-run(`ffmpeg -r $frame_rate -f image2 -s $(img_width)x$(img_height) -i anim2/frame_%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p wave_animation.mp4`)
+run(`ffmpeg -r $frame_rate -f image2 -s $(img_width)x$(img_height) -i anim2/frame_%d.png -vcodec libx264 -crf 25 -pix_fmt yuv420p -n wave_animation.mp4`)
