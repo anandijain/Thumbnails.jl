@@ -1,23 +1,22 @@
 using Images
 using ImageIO
 using VideoIO
+using Printf
 
-# Load image from the video
-vid = VideoIO.load("wave_animation3.mp4")
+# Load image from the first frame of the video
+
+v = VideoIO.openvideo("radial_animation.mp4")
+vid = VideoIO.load("radial_animation.mp4")
 
 # Function to apply the mask
-function mask_image(img, img2)
+function mask_image(img, img2; i_offset=size(img2, 1) ÷ 2 , j_offset=size(img2, 2) ÷ 2)
     alpha_mask1 = map(x -> x.alpha, img)
 
     # Check if dimensions of img2 are larger or equal to img
     if size(img2)[1] >= size(img)[1] && size(img2)[2] >= size(img)[2]
         
-        # Calculate starting positions for x and y coordinates to center the logo
-        start_x = round(Int, (size(img2)[1] - size(img)[1]) / 2)
-        start_y = round(Int, (size(img2)[2] - size(img)[2]) / 2)
-
-        # Create a new image from img with the same size as img2
-        new_img = deepcopy(img2)
+        # Create a new image from img with the same size as img
+        new_img = similar(img)
 
         # Iterate through the pixels of img
         for i in 1:size(img)[1]
@@ -25,9 +24,9 @@ function mask_image(img, img2)
                 alpha = alpha_mask1[i, j]
                 # Replace non-transparent pixels of img with the colors of img2
                 if alpha > 0
-                    new_img[start_x + i, start_y + j] = img2[start_x + i, start_y + j] + RGBA(0, 0, 0, 0) * (1 - alpha)
+                    new_img[i, j] = img2[i+i_offset, j+j_offset] + RGBA(0, 0, 0, 0) * (1 - alpha)
                 else
-                    new_img[start_x + i, start_y + j] = img[i, j]
+                    new_img[i, j] = img[i, j]
                 end
             end
         end
@@ -48,4 +47,12 @@ masked_frames = Vector{typeof(img)}(undef, length(vid))
 # Apply the masking effect to each frame of the video
 for (i, frame) in enumerate(vid)
     masked_frames[i] = mask_image(img, frame)
+end
+
+mkpath("anim4")
+  
+# Save each frame as a PNG image in anim4 directory
+for (i, frame) in enumerate(masked_frames)
+    filename = @sprintf("anim4/frame%03d.png", i)
+    save(filename, frame)
 end
