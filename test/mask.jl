@@ -2,7 +2,7 @@ using Images
 using ImageIO
 using VideoIO
 
-# Load image from the first frame of the video
+# Load image from the video
 vid = VideoIO.load("wave_animation3.mp4")
 
 # Function to apply the mask
@@ -12,8 +12,12 @@ function mask_image(img, img2)
     # Check if dimensions of img2 are larger or equal to img
     if size(img2)[1] >= size(img)[1] && size(img2)[2] >= size(img)[2]
         
-        # Create a new image from img with the same size as img
-        new_img = similar(img)
+        # Calculate starting positions for x and y coordinates to center the logo
+        start_x = round(Int, (size(img2)[1] - size(img)[1]) / 2)
+        start_y = round(Int, (size(img2)[2] - size(img)[2]) / 2)
+
+        # Create a new image from img with the same size as img2
+        new_img = deepcopy(img2)
 
         # Iterate through the pixels of img
         for i in 1:size(img)[1]
@@ -21,9 +25,9 @@ function mask_image(img, img2)
                 alpha = alpha_mask1[i, j]
                 # Replace non-transparent pixels of img with the colors of img2
                 if alpha > 0
-                    new_img[i, j] = img2[i, j] + RGBA(0, 0, 0, 0) * (1 - alpha)
+                    new_img[start_x + i, start_y + j] = img2[start_x + i, start_y + j] + RGBA(0, 0, 0, 0) * (1 - alpha)
                 else
-                    new_img[i, j] = img[i, j]
+                    new_img[start_x + i, start_y + j] = img[i, j]
                 end
             end
         end
