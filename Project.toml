@@ -1,0 +1,14 @@
+name = "Thumbnails"
+uuid = "54382c87-d523-4c57-ae0d-416747906918"
+authors = ["anand jain <anandj@uchicago.edu>"]
+version = "0.1.0"
+
+[deps]
+ImageSegmentation = "80713f31-8817-5129-9cf8-209ff8fb23e1"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
