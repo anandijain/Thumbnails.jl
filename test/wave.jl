@@ -10,7 +10,7 @@ frame_rate = 30
 frame_duration = 1 / frame_rate
 
 # Set the speed of the waves, in pixels per second
-wave_speed = 150
+wave_speed = 100
 
 # Set the amplitude and frequency of the waves
 wave_amplitude = 50
@@ -36,9 +36,23 @@ function generate_frame(output_image::Matrix{RGB{Float64}}, i::Int)
     for x in x_range
         for y in y_range
             output_image[y, x] = bg_color
+            # Calculate the distance from the current pixel to the nearest wave
+            distances = [(x - x_positions[k])^2 + (y - y_positions[l])^2 for k in x_range, l in y_range]
+            min_idx = argmin(distances)
+            min_x, min_y = LinearIndices(size(distances))[min_idx]
+            min_distance = sqrt(distances[min_x, min_y])
             # Check if the current pixel is within the bounds of the waves
-            if (x - x_positions[x])^2 + (y - y_positions[y])^2 <= wave_amplitude^2
-                output_image[y, x] = wave_color
+            if min_distance <= wave_amplitude
+                # Calculate the angle of the nearest wave at the current pixel
+                angle = atan(y - y_positions[min_y], x - x_positions[min_x])
+                # Calculate the reflected position of the wave at the current pixel
+                x_ref = x + 2 * min_distance * cos(angle)
+                y_ref = y + 2 * min_distance * sin(angle)
+                # Check if the reflected position is within the bounds of the frame
+                if 1 <= x_ref <= img_width && 1 <= y_ref <= img_height
+                    # Set the color of the reflected pixel to the wave color
+                    output_image[round(Int, y_ref), round(Int, x_ref)] = wave_color
+                end
             end
         end
     end
